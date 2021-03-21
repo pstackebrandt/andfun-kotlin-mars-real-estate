@@ -20,12 +20,9 @@ package com.example.android.marsrealestate.overview
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android.marsrealestate.network.MarsApiService.MarsApi
-import com.example.android.marsrealestate.network.MarsProperty
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
+import kotlinx.coroutines.launch
 
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
@@ -50,26 +47,13 @@ class OverviewViewModel : ViewModel() {
      * Sets the value of the status LiveData to the Mars API status.
      */
     private fun getMarsRealEstateProperties() {
-        MarsApi.retrofitService.getProperties()
-            .enqueue(object : Callback<List<MarsProperty>> {
-
-                /**
-                 * Invoked when a network exception occurred talking to the server or when an unexpected exception
-                 * occurred creating the request or processing the response.
-                 */
-                override fun onFailure(call: Call<List<MarsProperty>>, t: Throwable) {
-                    _response.value = "Failure: " + t.message
-                }
-
-                /**
-                 * Invoked for a received HTTP response.
-                 *
-                 * Note: An HTTP response may still indicate an application-level failure such as a 404 or 500.
-                 * Call [Response.isSuccessful] to determine if the response indicates success.
-                 */
-                override fun onResponse(call: Call<List<MarsProperty>>, response: Response<List<MarsProperty>>) {
-                    _response.value = "Success: ${response.body()?.size} Mars properties received"
-                }
-            })
+        viewModelScope.launch {
+            try {
+                val listResult = MarsApi.retrofitService.getProperties()
+                _response.value = "Success: ${listResult.size} Mars properties retrieved"
+            } catch (e: Exception) {
+                _response.value = "Failure: ${e.message}"
+            }
+        }
     }
 }
