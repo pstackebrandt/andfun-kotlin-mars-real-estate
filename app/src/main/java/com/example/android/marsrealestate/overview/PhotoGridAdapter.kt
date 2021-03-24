@@ -30,6 +30,10 @@ class PhotoGridAdapter : ListAdapter<MarsProperty, PhotoGridAdapter.MarsProperty
 
     // Since the base view holder class requires a view in its constructor,
     // we'll pass in the binding root view.
+    /**
+     * The MarsPropertyViewHolder constructor takes the binding variable from the associated
+     * GridViewItem, which nicely gives it access to the full [MarsProperty] information.
+     */
     class MarsPropertyViewHolder(private var binding: GridViewItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
@@ -45,6 +49,10 @@ class PhotoGridAdapter : ListAdapter<MarsProperty, PhotoGridAdapter.MarsProperty
         }
     }
 
+    /**
+     * Allows the RecyclerView to determine which items have changed when the [List] of [MarsProperty]
+     * has been updated.
+     */
     companion object DiffCallback : DiffUtil.ItemCallback<MarsProperty>() {
 
         override fun areItemsTheSame(oldItem: MarsProperty, newItem: MarsProperty): Boolean {
