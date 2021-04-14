@@ -26,6 +26,11 @@ import com.example.android.marsrealestate.databinding.GridViewItemBinding
 import com.example.android.marsrealestate.network.MarsProperty
 
 // ListAdapter is from recyclerview library
+/**
+ * This class implements a [RecyclerView] [ListAdapter] which uses Data Binding to present [List]
+ * data, including computing diffs between lists.
+ * @param onClick a lambda that takes the
+ */
 class PhotoGridAdapter(val onClickListener: OnClickListener)
     : ListAdapter<MarsProperty, PhotoGridAdapter.MarsPropertyViewHolder>(DiffCallback) {
 
@@ -46,6 +51,8 @@ class PhotoGridAdapter(val onClickListener: OnClickListener)
             // Since we're calling bind from on-bind view holder, having the bindings
             // execute immediately as a practice can prevent the RecyclerView
             // from having to perform extra calculations when it figures out how to display the list.
+            // (This is important, because it forces the data binding to execute immediately,
+            // which allows the RecyclerView to make the correct view size measurements)
             binding.executePendingBindings()
         }
     }
@@ -66,6 +73,7 @@ class PhotoGridAdapter(val onClickListener: OnClickListener)
     }
 
     /**
+     * Create new [RecyclerView] item views (invoked by the layout manager)
      * Called when RecyclerView needs a new ViewHolder of the given type to represent
      * an item.
      *
@@ -92,6 +100,7 @@ class PhotoGridAdapter(val onClickListener: OnClickListener)
      * this method and should not keep a copy of it. If you need the position of an item later
      * on (e.g. in a click listener), use ViewHolder.getBindingAdapterPosition which
      * will have the updated adapter position.
+     * (Replaces the contents of a view (invoked by the layout manager))
      */
     override fun onBindViewHolder(holder: MarsPropertyViewHolder, position: Int) {
         val marsProperty = getItem(position)
@@ -101,8 +110,12 @@ class PhotoGridAdapter(val onClickListener: OnClickListener)
         holder.bind(marsProperty)
     }
 
+    /**
+     * Custom listener that handles clicks on [RecyclerView] items.  Passes the [MarsProperty]
+     * associated with the current item to the [onClick] function.
+     * @param clickListener lambda that will be called with the current [MarsProperty]
+     */
     class OnClickListener(val clickListener: (marsProperty: MarsProperty) -> Unit) {
         fun onClick(marsProperty: MarsProperty) = clickListener(marsProperty)
     }
 }
-

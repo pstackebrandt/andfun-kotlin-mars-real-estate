@@ -68,6 +68,24 @@ class OverviewFragment : Fragment() {
             }
         })
 
+        // Sets the adapter of the photosGrid RecyclerView with clickHandler lambda that
+        // tells the viewModel when our property is clicked
+        binding.photosGrid.adapter = PhotoGridAdapter(PhotoGridAdapter.OnClickListener {
+            viewModel.displayPropertyDetails(it)
+        })
+
+        // Observe the navigateToSelectedProperty LiveData and Navigate when it isn't null
+        // After navigating, call displayPropertyDetailsComplete() so that the ViewModel is ready
+        // for another navigation event.
+        viewModel.navigateToSelectedProperty.observe(this, Observer {
+            if ( null != it ) {
+                // Must find the NavController from the Fragment
+                this.findNavController().navigate(OverviewFragmentDirections.actionShowDetail(it))
+                // Tell the ViewModel we've made the navigate call to prevent multiple navigation
+                viewModel.displayPropertyDetailsComplete()
+            }
+        })
+
         setHasOptionsMenu(true)
         return binding.root
     }
@@ -98,5 +116,20 @@ class OverviewFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.overflow_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    /**
+     * Updates the filter in the [OverviewViewModel] when the menu items are selected from the
+     * overflow menu.
+     */
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewModel.updateFilter(
+                when (item.itemId) {
+                    R.id.show_rent_menu -> MarsApiFilter.SHOW_RENT
+                    R.id.show_buy_menu -> MarsApiFilter.SHOW_BUY
+                    else -> MarsApiFilter.SHOW_ALL
+                }
+        )
+        return true
     }
 }

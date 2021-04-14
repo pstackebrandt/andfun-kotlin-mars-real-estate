@@ -32,6 +32,10 @@ enum class MarsApiFilter(val value: String) {
     SHOW_ALL("all")
 }
 
+/**
+ * Build the Moshi object that Retrofit will be using, making sure to add the Kotlin adapter for
+ * full Kotlin compatibility.
+ */
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
     .build()
@@ -43,9 +47,13 @@ private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .build()
 
+/**
+ * A public interface that exposes the [getProperties] method
+ */
 interface MarsApiService {
 
     /**
+     * Returns a Coroutine [List] of [MarsProperty] which can be fetched with await() if in a Coroutine scope.
      * The @GET annotation indicates that the "realestate" endpoint will be requested with the GET
      * HTTP method
      */
@@ -55,6 +63,9 @@ interface MarsApiService {
         type: String)
         : List<MarsProperty>
 
+    /**
+     * A public Api object that exposes the lazy-initialized Retrofit service
+     */
     object MarsApi {
         val retrofitService: MarsApiService by lazy {
             retrofit.create(MarsApiService::class.java)
